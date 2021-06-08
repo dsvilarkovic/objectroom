@@ -44,6 +44,60 @@ public static class PoissonDiscSampling
 		return points;
 	}
 
+	public static List<Vector2> GeneratePointsInRestrictedViewPort(float radius, Vector2 sampleRegionSize, int NumOfObj, GameObject camera, int numSamplesBeforeRejection = 100)
+	{
+		float cellSize = radius / Mathf.Sqrt(2);
+		//making grid of spot sizes based on numOfObj, to make objects generated without over 
+		int[,] grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
+		List<Vector2> points = new List<Vector2>();
+		List<Vector2> spawnPoints = new List<Vector2>();
+
+		spawnPoints.Add(sampleRegionSize / 2);
+		Debug.Log("What we wish: " + NumOfObj);
+
+		Camera cameraComponent = camera.GetComponent<Camera>();
+		while (spawnPoints.Count > 0 && points.Count != NumOfObj + 1)
+		{
+			int spawnIndex = Random.Range(0, spawnPoints.Count);
+			Vector2 spawnCentre = spawnPoints[spawnIndex];
+			bool candidateAccepted = false;
+
+			int i;
+			for (i = 0; i < numSamplesBeforeRejection; i++)
+			{
+				float angle = Random.value * Mathf.PI * 2;
+				Vector2 dir = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle));
+				Vector2 candidate = spawnCentre + dir * Random.Range(radius, 2 * radius);
+				if (IsValid(candidate, sampleRegionSize, cellSize, radius, points, grid) && IsInCameraViewport(candidate, cameraComponent,sampleRegionSize.x,sampleRegionSize.y))
+				{
+					points.Add(candidate);
+					spawnPoints.Add(candidate);
+					grid[(int)(candidate.x / cellSize), (int)(candidate.y / cellSize)] = points.Count;
+					candidateAccepted = true;
+					break;
+				}
+			}
+			Debug.Log("Stopped at iteration: " + i);
+			if (!candidateAccepted)
+			{
+				spawnPoints.RemoveAt(spawnIndex);
+			}
+		}
+
+
+		return points;
+	}
+
+
+	static bool IsInCameraViewport(Vector2 candidate, Camera cameraComponent, float SpawnAreaX, float SpawnAreaY)
+	{
+		Vector3 newPos = new Vector3(candidate.x - SpawnAreaX/2, 0, candidate.y - SpawnAreaY/2);
+		// Vector3 viewPointNewPos = camera.GetComponent<Camera>().WorldToViewportPoint(newPos);
+		Vector3 viewPointNewPos = cameraComponent.WorldToViewportPoint(newPos);
+
+		return viewPointNewPos.z > 0 && viewPointNewPos.x > 0 && viewPointNewPos.x < 1 && viewPointNewPos.y > 0 && viewPointNewPos.y < 1;
+	}
+
 	static bool IsValid(Vector2 candidate, Vector2 sampleRegionSize, float cellSize, float radius, List<Vector2> points, int[,] grid)
 	{
 		if (candidate.x >= 0 && candidate.x < sampleRegionSize.x && candidate.y >= 0 && candidate.y < sampleRegionSize.y)

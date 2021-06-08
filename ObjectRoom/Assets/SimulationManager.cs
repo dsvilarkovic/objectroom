@@ -41,6 +41,22 @@ public class SimulationManager : MonoBehaviour
         camera.transform.localRotation = Quaternion.Euler(30, Random.Range(-30f,30f), 0);
     }
 
+
+    private void WriteToFile(string text, string fileName)	
+    {	
+        try	
+        {	
+            var filepath = Path.Combine(Manager.Instance.GetDirectoryFor(DataCapturePaths.Logs), fileName);	
+            using (var writer = File.AppendText(filepath))	
+            {	
+                writer.Write(text + Environment.NewLine);	
+            }	
+        }catch (Exception e)	
+        {	
+            Log.E("UpdateHeartbeat.Write exception : " + e.ToString());	
+        }	
+    }
+
     void DestroyAll()
     {
         for (int i = 0; i < gameList.Count; i++)
@@ -58,6 +74,9 @@ public class SimulationManager : MonoBehaviour
         NumOfObj = Random.Range(NumberOfObjectsMin, NumberOfObjectsMax);
         Dist = Mathf.Sqrt((SpawnAreaX * SpawnAreaY) / NumOfObj);
         newPosList = PoissonDiscSampling.GeneratePoints(Dist, new Vector2(SpawnAreaX, SpawnAreaY));
+
+        // TODO: Add restricted camera viewport implementation
+        // newPosList = PoissonDiscSampling.GeneratePointsInRestrictedViewPort(Dist, new Vector2(SpawnAreaX, SpawnAreaY), NumOfObj, camera);
     }
 
     void SpawnObjects(int n_obj)
