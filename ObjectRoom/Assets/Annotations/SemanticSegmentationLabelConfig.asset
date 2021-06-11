@@ -25,3 +25,7 @@ MonoBehaviour:
     color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - label: torusknot
     color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  - label: wall
+    color: {r: 1, g: 0.47183698, b: 0.9311627, a: 1}
+  - label: Plane
+    color: {r: 1, g: 0.64269906, b: 0.29446805, a: 1}

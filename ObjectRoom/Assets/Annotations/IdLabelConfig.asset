@@ -23,5 +23,9 @@ MonoBehaviour:
     id: 4
   - label: triangle
     id: 5
+  - label: wall
+    id: 6
+  - label: Plane
+    id: 7
   autoAssignIds: 1
   startingLabelId: 1
