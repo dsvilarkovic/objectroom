@@ -333,6 +333,6 @@ public class SimulationManager : MonoBehaviour
 		// Vector3 viewPointNewPos = camera.GetComponent<Camera>().WorldToViewportPoint(newPos);
 		Vector3 viewPointNewPos = camera.GetComponent<Camera>().WorldToViewportPoint(newPos);
 
-		return viewPointNewPos.z > 0 && viewPointNewPos.x > 0 && viewPointNewPos.x < 1 && viewPointNewPos.y > 0 && viewPointNewPos.y < 1;
+		return viewPointNewPos.z > 0.1 && viewPointNewPos.x > 0.1 && viewPointNewPos.x < 0.9 && viewPointNewPos.y > 0.1 && viewPointNewPos.y < 0.9;
 	}
 }
