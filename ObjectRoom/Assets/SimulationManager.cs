@@ -296,6 +296,7 @@ public class SimulationManager : MonoBehaviour
             // GameObject newobj = Instantiate(RandomObjects[Random.Range(0, RandomObjects.Length)], newPos, Quaternion.Euler(0, 0, 0), this.transform);
 
 
+
             newobj.GetComponent<Renderer>().material.SetColor("_BaseColor", Color.HSVToRGB(Random.Range(0f, 1f), 0.8f, 0.8f));
             
             //scaling 
