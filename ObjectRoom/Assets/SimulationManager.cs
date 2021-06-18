@@ -209,7 +209,7 @@ public class SimulationManager : MonoBehaviour
             objPos.index = i;
             objPos.type = gameList[i].name;
 
-            objPos.scale = gameList[i].transform.localScale.y;
+            objPos.scale = gameList[i].transform.localScale.y; // Irrelevant, given that scaling is done differently on dataset, and when predicting
 
             objPos.orientation = gameList[i].transform.eulerAngles.y;
             singleFrame.foregroundObjects.Add(objPos); 
@@ -226,7 +226,7 @@ public class SimulationManager : MonoBehaviour
             objPos.index = i;
             objPos.type = StageElements[i].name;
 
-            objPos.scale = StageElements[i].transform.localScale.y;
+            objPos.scale = StageElements[i].transform.localScale.y; // Irrelevant, given that scaling is done differently on dataset, and when predicting
 
             objPos.orientation = StageElements[i].transform.eulerAngles.y;
             singleFrame.backgroundObjects.Add(objPos); 
@@ -300,8 +300,8 @@ public class SimulationManager : MonoBehaviour
             newobj.GetComponent<Renderer>().material.SetColor("_BaseColor", Color.HSVToRGB(Random.Range(0f, 1f), 0.8f, 0.8f));
             
             //scaling 
-            float[] scales = new float[3]{Random.Range(0.2f, 1.0f), Random.Range(0.2f, 1.0f), Random.Range(0.2f, 1.0f)};
-            newobj.transform.localScale = new Vector3(scales[1], scales[1], scales[1]);
+            float[] scales = new float[3]{Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f)};
+            newobj.transform.localScale = new Vector3(scales[1], scales[2], scales[3]);
             // newobj.transform.Translate = new Vector3(scales[0], scales[1], scales[2]);
             //fix scaling wrt y axis
 
