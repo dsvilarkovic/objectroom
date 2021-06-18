@@ -61,7 +61,7 @@ for current_i_frame in range(1,frame_count-1):
     
     #Goal : depth_gt [B, 1, 64, 64]
 
-    # sample_frames['depth_gt'].append(absolute_depth_image[None,:,:,None])
+    sample_frames['depth_gt'].append(absolute_depth_image[None,:,:,None])
     
     foreground_mask_instances = []
     foreground_latent_instances = []
@@ -79,11 +79,11 @@ for current_i_frame in range(1,frame_count-1):
     
     #Goal 'fore_msk_gt' [B, N, 1, 64, 64]
 
-    # sample_frames['fore_msk_gt'].append(np.array(foreground_mask_instances)[:,None,:,:,0])
+    sample_frames['fore_msk_gt'].append(np.array(foreground_mask_instances)[:,None,:,:,0])
     
     #Goal 'fore_z_extr_gt' [B,N,1,5]
 
-    # sample_frames['fore_z_extr_gt'].append(np.array(foreground_latent_instances)[:,None,:])
+    sample_frames['fore_z_extr_gt'].append(np.array(foreground_latent_instances)[:,None,:])
     
     
     background_mask_instances = []
@@ -103,11 +103,11 @@ for current_i_frame in range(1,frame_count-1):
     
     #Goal 'back_msk_gt' [B, N, 1, 64, 64]
 
-    # sample_frames['back_msk_gt'].append(np.array(background_mask_instances)[:,None,:,:,0])
+    sample_frames['back_msk_gt'].append(np.array(background_mask_instances)[:,None,:,:,0])
 
     #Goal 'back_z_extr_gt' [B,N,1,5]
 
-    # sample_frames['back_z_extr_gt'].append(np.array(background_latent_instances)[:,None,:])
+    sample_frames['back_z_extr_gt'].append(np.array(background_latent_instances)[:,None,:])
     
     if(current_i_frame % 100 == 0):
         print(f'{current_i_frame}/12000, {current_i_frame/12000}%')
@@ -130,8 +130,12 @@ print(np.array(sample_frames['back_z_extr_gt']).shape)
 
 
 
+## Saving them
+split_ranges =  {'train' : (0,9000),'val' : (9000,10000), 'test' : (10000,12500)} 
+
 for key,value in sample_frames.items():
-    if(len(value) == 0):
-        continue  
-    with open(f'{key}_{type_dataset}.npy', 'wb') as f:
-        np.save(key + "_" + type_dataset, np.array(value))
+    for split_type, split_range  in split_ranges.items():
+        with open(f'{key}_{split_type}.npy', 'wb') as f:
+            save_value = np.array(value[split_range[0]:split_range[1]])
+            print(save_value.shape)
+            np.save(key + '_' + split_type, save_value)
