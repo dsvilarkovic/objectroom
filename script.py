@@ -129,7 +129,11 @@ print(np.array(sample_frames['back_msk_gt']).shape)
 print(np.array(sample_frames['back_z_extr_gt']).shape)
 
 
+mask = np.concatenate([sample_frames['fore_msk_gt'], sample_frames['back_msk_gt']], axis = 1)
+obj_extrs = np.concatenate([sample_frames['fore_z_extr_gt'], sample_frames['back_z_extr_gt']], axis = 1)
 
+sample_frames['mask'] = mask
+sample_frames['obj_extrs] = obj_extrs
 ## Saving them
 split_ranges =  {'train' : (0,9000),'val' : (9000,10000), 'test' : (10000,12500)} 
 
@@ -139,3 +143,4 @@ for key,value in sample_frames.items():
             save_value = np.array(value[split_range[0]:split_range[1]])
             print(save_value.shape)
             np.save(key + '_' + split_type, save_value)
+           
