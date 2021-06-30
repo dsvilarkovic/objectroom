@@ -133,7 +133,7 @@ mask = np.concatenate([sample_frames['fore_msk_gt'], sample_frames['back_msk_gt'
 obj_extrs = np.concatenate([sample_frames['fore_z_extr_gt'], sample_frames['back_z_extr_gt']], axis = 1)
 
 sample_frames['mask'] = mask
-sample_frames['obj_extrs] = obj_extrs
+sample_frames['obj_extrs'] = obj_extrs
 ## Saving them
 split_ranges =  {'train' : (0,9000),'val' : (9000,10000), 'test' : (10000,12500)} 
 
