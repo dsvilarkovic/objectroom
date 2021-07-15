@@ -8,7 +8,10 @@ import imageio
 import os.path
 
 
-type_dataset = str(sys.argv[1])
+## I added this to defend myself from missing that it can change
+spawn_area_x = str(sys.argv[1])
+spawn_area_y = str(sys.argv[2])
+spawn_distance_z = str(sys.argv[2])
 
 def get_absolute_depth_image(image,near = 0.8, far = 15):
     k1 = (far + near) / (far - near)
@@ -17,13 +20,19 @@ def get_absolute_depth_image(image,near = 0.8, far = 15):
     divisor = np.max(image[:,:,0]) if np.max(image[:,:,0]) != 0 else 127.0 
     res = k2 / ((image[:,:,0] / divisor) - k1)  
 
-
+    res = far + near - res  #to inverse depth map
     return res
+
+def rgb_to_grayscale(image_to_convert):
+    rgb_weights = [0.2989, 0.5870, 0.1140]
+    grayscale_image = np.dot(image_to_convert[...,:3], rgb_weights)
+
+    return grayscale_image[:,:,None] #increase dimension
 
 
 sample_frames = {'rgb_in' : [], 'rgb_gt' : [], 'depth_gt' : [], 'fore_msk_gt' : [], 'fore_z_extr_gt' : [], 'back_msk_gt' : [], 'back_z_extr_gt' : []}
 
-path = 'full_12k_samples_dataset_3_objects'
+path = '.'
 with open(f'{path}/logs/objects_relative_to_cam.json') as f:
   data = json.load(f)
 
@@ -32,15 +41,15 @@ frame_count = len(data['contentList'])
 for current_i_frame in range(1,frame_count-1):
 
 
-    if(type_dataset == 'test'):
-        if(current_i_frame < 11001 or current_i_frame > 12001):
-            continue
-    if(type_dataset == 'val'):
-        if(current_i_frame < 9001 or current_i_frame > 11001):
-            continue
-    if(type_dataset == 'train'):
-        if(current_i_frame > 9000):
-            break
+    # if(type_dataset == 'test'):
+    #     if(current_i_frame < 11001 or current_i_frame > 12001):
+    #         continue
+    # if(type_dataset == 'val'):
+    #     if(current_i_frame < 9001 or current_i_frame > 11001):
+    #         continue
+    # if(type_dataset == 'train'):
+    #     if(current_i_frame > 9000):
+    #         break
 
     full_frame_index = data['contentList'][current_i_frame]['index']
 
@@ -67,14 +76,15 @@ for current_i_frame in range(1,frame_count-1):
     foreground_latent_instances = []
     for current_object in range(foreground_len):
         single_mask_instance = imageio.imread(f'{path}/instances/Instance_{full_frame_index+2+current_object}.png')
+        single_mask_instance = rgb_to_grayscale(single_mask_instance)
         restructured_single_mask_instance = (single_mask_instance[:,:,:] > 0).astype('bool')
         foreground_mask_instances.append(restructured_single_mask_instance)
 
 
-        orientation = data['contentList'][current_i_frame]['foregroundObjects'][current_object]['orientation']
-        scale = data['contentList'][current_i_frame]['foregroundObjects'][current_object]['scale']
+        orientation = 1/np.pi * np.deg2rad(data['contentList'][current_i_frame]['foregroundObjects'][current_object]['orientation'])
+        scale = 1.25 * data['contentList'][current_i_frame]['foregroundObjects'][current_object]['scale']
 
-        object_latent_variable = np.array(data['contentList'][current_i_frame]['foregroundObjects'][current_object]['position'] + [orientation, scale])
+        object_latent_variable = np.array([scale] + data['contentList'][current_i_frame]['foregroundObjects'][current_object]['position'] + [orientation])
         foreground_latent_instances.append(object_latent_variable)
     
     #Goal 'fore_msk_gt' [B, N, 1, 64, 64]
@@ -91,6 +101,7 @@ for current_i_frame in range(1,frame_count-1):
 
     for current_object in range(background_len):
         single_mask_instance = imageio.imread(f'{path}/instances/Instance_{full_frame_index+2+foreground_len + current_object}.png')
+        single_mask_instance = rgb_to_grayscale(single_mask_instance)
         restructured_single_mask_instance = (single_mask_instance[:,:,:] > 0).astype('bool')
         background_mask_instances.append(restructured_single_mask_instance)
 
@@ -110,7 +121,7 @@ for current_i_frame in range(1,frame_count-1):
     sample_frames['back_z_extr_gt'].append(np.array(background_latent_instances)[:,None,:])
     
     if(current_i_frame % 100 == 0):
-        print(f'{current_i_frame}/12000, {current_i_frame/12000}%')
+        print(f'{current_i_frame}/12000, {current_i_frame/12000*100}%')
 
 
 
@@ -144,3 +155,4 @@ for key,value in sample_frames.items():
             print(save_value.shape)
             np.save(key + '_' + split_type, save_value)
            
+{"mode":"full","isActive":False}
