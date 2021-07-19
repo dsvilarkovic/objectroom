@@ -90,19 +90,19 @@ public class SimulationManager : MonoBehaviour
         // NativeList<float2> placementSamples = NewPositions();
         // SpawnObjects(NumOfObj, placementSamples);
 
-        if (frameCounter % (gameList.Count + StageElements.Length + 1) == 0)
+        if (frameCounter % (gameList.Count + StageElements.Length + 2) == 0)
         {
+            camera.transform.localRotation = Quaternion.Euler(30, Random.Range(-30f,30f), 0);    
             DestroyAll();
             RandomizeStage();
             NativeList<float2> placementSamples = NewPositions();
             SpawnObjects(NumOfObj, placementSamples);
-            camera.transform.localRotation = Quaternion.Euler(30, Random.Range(-30f,30f), 0);    
         }
     
         if(gameList.Count != NumOfObj){
             throw(new Exception("Game List and NumOfObj have incompatible number of objects"));
         }
-        if(!(frameCounter % (gameList.Count + StageElements.Length + 1) == 0)){
+        if(!(frameCounter % (gameList.Count + StageElements.Length + 2) == 0)){
             SwitchActiveObject();
         }
         else{
@@ -130,13 +130,22 @@ public class SimulationManager : MonoBehaviour
         }
         try{
             //when removing objects
-            int current_index = frameCounter % (gameList.Count + StageElements.Length + 1);
+            // int current_index = frameCounter % (gameList.Count + StageElements.Length + 1);
+            int current_index = frameCounter % (gameList.Count + StageElements.Length + 2);
 
             if(current_index <= gameList.Count){
                 gameList[current_index - 1].SetActive(true);
             }
             else{
-                StageElements[current_index - gameList.Count - 1].SetActive(true);
+                if(current_index == gameList.Count + StageElements.Length + 1){
+                    for (int i = 0; i < StageElements.Length; i++)
+                    {
+                        StageElements[i].SetActive(true);
+                    }
+                }
+                else{
+                    StageElements[current_index - gameList.Count - 1].SetActive(true);
+                }
             }
         }
         catch(ArgumentOutOfRangeException){
@@ -300,9 +309,9 @@ public class SimulationManager : MonoBehaviour
             newobj.GetComponent<Renderer>().material.SetColor("_BaseColor", Color.HSVToRGB(Random.Range(0f, 1f), 0.8f, 0.8f));
             
             //scaling 
-            float[] scales = new float[3]{Random.Range(0.2f, 1.0f), Random.Range(0.2f, 1.0f), Random.Range(0.2f, 1.0f)};
-            newobj.transform.localScale = new Vector3(scales[1], scales[1], scales[1]);
-            // newobj.transform.Translate = new Vector3(scales[0], scales[1], scales[2]);
+            float[] scales = new float[3]{Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f)};
+            // newobj.transform.localScale = new Vector3(scales[1], scales[1], scales[1]);
+            newobj.transform.localScale = new Vector3(scales[0], scales[1], scales[2]);
             //fix scaling wrt y axis
 
             // newobj.transform.Translate(new Vector3(0, (newobj.transform.position.y - newobj.GetComponent<MeshFilter>().mesh.bounds.min.y), 0));
@@ -355,10 +364,12 @@ public class SimulationManager : MonoBehaviour
 
 	static bool IsInCameraViewport(Vector2 candidate, GameObject camera, float SpawnAreaX, float SpawnAreaY)
 	{
-		Vector3 newPos = new Vector3(candidate.x - SpawnAreaX/2, 0, candidate.y - SpawnAreaY/2);
+        var offset = new Vector3(SpawnAreaX, 0, SpawnAreaY) * -0.5f;
+        Vector3 newPos = new Vector3(candidate.x, 0, candidate.y) + offset;
+		// Vector3 newPos = new Vector3(candidate.x - SpawnAreaX/2, 0, candidate.y - SpawnAreaY/2);
 		// Vector3 viewPointNewPos = camera.GetComponent<Camera>().WorldToViewportPoint(newPos);
 		Vector3 viewPointNewPos = camera.GetComponent<Camera>().WorldToViewportPoint(newPos);
 
-		return viewPointNewPos.z > 0.1 && viewPointNewPos.x > 0.25 && viewPointNewPos.x < 0.75 && viewPointNewPos.y > 0.1 && viewPointNewPos.y < 0.9;
+		return viewPointNewPos.z > 0.1  && viewPointNewPos.x > 0.25 && viewPointNewPos.x < 0.75 && viewPointNewPos.y > 0.2  && viewPointNewPos.y < 0.8;
 	}
 }
