@@ -24,6 +24,11 @@ dataset_folder
 └───logs #for positions, scales and orientations of the objects
 │   │   objects_relative_to_cam.json 
 |
+└───rgb # for images each object
+|   │   rgb_1.png
+|   │   rgb_2.png
+|   │   rgb_3.png
+|   │   ...
 └───depth_map # for depth maps of the object
 |   │   aov_image_0001.png
 |   │   aov_image_0002.png
