@@ -13,6 +13,7 @@
 Reproduction of the Objects Room dataset from Deep Mind https://github.com/deepmind/multi_object_datasets#objects-room. <br>
 The difference between the original repository and ours is that ours includes Depth Maps and reproducible environment. 
 
+The default version for creation is for 3 objects, but can be easily configured in <code>ObjectRoom/Assets/SimulationManager.cs</code> for variable <code> NumOfObj </code> <br>
 The only requirement is Unity (2020.3.7f1 was used, other versions have problems with simultaniously creating depth maps and other masks and rgb image). 
 
 All of the settings like number of spawned objects, types of objects, spawn area etc. are set through the Simulation Manager object in the scene. 
@@ -65,3 +66,5 @@ dataset_folder
     │   Instances_3.png
     │   ...
 ```
+
+First version of this repo created by [wandrzej](https://github.com/wandrzej/objectroom), this is a refinement created by us for the project done for the research thesis. 
